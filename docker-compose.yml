@@ -1,0 +1,77 @@
+version: "3"
+
+services:
+  node1:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.2:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8082:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.2
+  node2:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.3:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8083:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.3
+  node3:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.4:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8084:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.4
+  node4:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.5:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8086:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.5
+  node5:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.6:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8087:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.6
+  node6:
+    build: .
+    environment:
+      - SOCKET_ADDRESS=10.10.0.7:8085
+      - VIEW="10.10.0.2:8085,10.10.0.3:8085,10.10.0.4:8085,10.10.0.5:8085,10.10.0.6:8085,10.10.0.7:8085"
+      - SHARD_COUNT="2"
+    ports:
+      - 8088:8085
+    networks:
+      mynet:
+        ipv4_address: 10.10.0.7
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.0.0/16
