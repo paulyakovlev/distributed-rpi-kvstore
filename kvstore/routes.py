@@ -5,63 +5,63 @@ import os
 import requests
 
 # our key-value store
-keyStore = {}
+key_store = {}
 
 # find out if we're a forwarding container
-isForwarding = False
+is_forwarding = False
 if app.config['FORWARDING_ADDRESS'] is not None:
-    fwdAddress = app.config['FORWARDING_ADDRESS']
-    isForwarding = True
+    forwarding_address = app.config['FORWARDING_ADDRESS']
+    is_forwarding = True
 
 # /key-value-store endpoint
 @app.route('/key-value-store/<key>', methods=['GET', 'PUT', 'DELETE'])
-def keyValueStore(key):
+def key_value_store(key):
 
     # handle forwarding
     # if we're a forwarding instance, don't process request and just send it to main
-    if isForwarding:
+    if is_forwarding:
         print('Forwarding container received %s' % request.method, flush=True)
         # forward request to main, based onthe FORWARDING_ADDRESS we have
-        url = 'http://' + fwdAddress + '/key-value-store/' + key
+        url = 'http://' + forwarding_address + '/key-value-store/' + key
         try:
             # forward GET
             if(request.method == 'GET'):
                 r = requests.get(url=url, timeout=2.5)
                 response = r.json()
-                statusCode = r.status_code
+                status_code = r.status_code
             # forward PUT
             if(request.method == 'PUT'):
                 r = requests.put(url=url, json=request.json, timeout=2.5)
                 response = r.json()
-                statusCode = r.status_code
+                status_code = r.status_code
             # forward DELETE
             if(request.method == 'DELETE'):
                 r = requests.delete(url=url, timeout=2.5)
                 response = r.json()
-                statusCode = r.status_code
+                status_code = r.status_code
         except requests.exceptions.ConnectionError:
             print('Connection error', flush=True)
             response = {
                 'error': 'Main instance is down',  'message': 'Error in %s' % request.method}
-            statusCode = 503
+            status_code = 503
         # if request to main takes too long then we assume its down
         except requests.Timeout:
             print('Request to main timed out', flush=True)
             response = {
                 'error': 'Main instance is down',  'message': 'Error in %s' % request.method}
-            statusCode = 503
+            status_code = 503
     else:
         print('Main container received %s' % request.method, flush=True)
         # GET
         if(request.method == 'GET'):
-            if(key in keyStore):
+            if(key in key_store):
                 response = {
-                    'doesExist': True, 'message': 'Retrieved successfully', 'value': keyStore[key]}
-                statusCode = 200
+                    'doesExist': True, 'message': 'Retrieved successfully', 'value': key_store[key]}
+                status_code = 200
             else:
                 response = {
                     'doesExist': False, 'error': 'Key does not exist', 'message': 'Error in GET'}
-                statusCode = 404
+                status_code = 404
 
         # PUT
         if(request.method == 'PUT'):
@@ -69,33 +69,33 @@ def keyValueStore(key):
                 if (len(key) > 50):
                     response = {
                         'error': 'Key is too long', 'message': 'Error in PUT'}
-                    statusCode = 400
+                    status_code = 400
                 else:
-                    if (key in keyStore):
-                        keyStore[key] = request.json['value']
+                    if (key in key_store):
+                        key_store[key] = request.json['value']
                         response = {
                             'message': 'Updated successfully', 'replaced': True}
-                        statusCode = 200
+                        status_code = 200
                     else:
-                        keyStore[key] = request.json['value']
+                        key_store[key] = request.json['value']
                         response = {'message': 'Added successfully',
                                     'replaced': False}
-                        statusCode = 201
+                        status_code = 201
             else:
                 response = {'error': 'Value is missing',
                             'message': "Error in PUT"}
-                statusCode = 400
+                status_code = 400
 
         # DELETE
         if(request.method == 'DELETE'):
-            if (key in keyStore):
-                del keyStore[key]
+            if (key in key_store):
+                del key_store[key]
                 response = {
                     'doesExist': True, 'message': 'Deleted successfully'}
-                statusCode = 200
+                status_code = 200
             else:
                 response = {
                     'doesExist': False, 'error': 'Key does not exist', 'message': 'Error in DELETE'}
-                statusCode = 404
+                status_code = 404
 
-    return jsonify(response), statusCode
+    return jsonify(response), status_code
