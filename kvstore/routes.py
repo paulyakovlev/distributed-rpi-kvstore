@@ -9,8 +9,8 @@ keyStore = {}
 
 # find out if we're a forwarding container
 isForwarding = False
-if "FORWARDING_ADDRESS" in os.environ:
-    fwdAddress = os.environ['FORWARDING_ADDRESS']
+if app.config['FORWARDING_ADDRESS'] is not None:
+    fwdAddress = app.config['FORWARDING_ADDRESS']
     isForwarding = True
 
 # /key-value-store endpoint
