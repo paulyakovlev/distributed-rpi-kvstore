@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, make_response
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, fields
 from functools import wraps
 import os
 import requests
@@ -8,13 +8,16 @@ import requests
 key_store = {}
 
 # find out if we're a forwarding container
-isForwarding = False
+is_forwarding = False
 if "FORWARDING_ADDRESS" in os.environ:
     forwarding_address = os.environ['FORWARDING_ADDRESS']
     is_forwarding = True
 
 # set namespace
 api = Namespace('kvstore', description='Key-value store related operations')
+
+key_value = api.model('Value', {"value": fields.String(
+    required=True, description="The task details")})
 
 
 def forward_request(f):
@@ -77,6 +80,7 @@ class KeyStore(Resource):
         return make_response(jsonify(response), status_code)
 
     @forward_request
+    @api.expect(key_value)
     def put(self, key):
         print('Main container received %s' % request.method, flush=True)
 
