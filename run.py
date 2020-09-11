@@ -1,5 +1,5 @@
 from flask import Flask
-from kvstore import api
+from apis import api
 from os import environ
 
 if __name__ == '__main__':
