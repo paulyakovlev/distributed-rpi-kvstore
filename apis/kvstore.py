@@ -7,16 +7,13 @@ import requests
 # our key-value store
 key_store = {}
 
-is_forwarding = False
-forwarding_address = 42069
-
 # find out if we're a forwarding container
 isForwarding = False
 if "FORWARDING_ADDRESS" in os.environ:
     forwarding_address = os.environ['FORWARDING_ADDRESS']
     is_forwarding = True
 
-
+# set namespace
 api = Namespace('kvstore', description='Key-value store related operations')
 
 
